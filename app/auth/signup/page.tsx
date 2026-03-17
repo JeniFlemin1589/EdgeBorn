@@ -12,7 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export default function SignupPage() {
+function SignupContent() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
@@ -170,5 +170,15 @@ export default function SignupPage() {
                 .
             </p>
         </div>
+    );
+}
+
+import { Suspense } from "react";
+
+export default function SignupPage() {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
+            <SignupContent />
+        </Suspense>
     );
 }
