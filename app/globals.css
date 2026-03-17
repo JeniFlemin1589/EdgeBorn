@@ -112,34 +112,6 @@
   --sidebar-ring: oklch(0.45 0.22 25);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Dark Mode - Deep Navy & Slate */
-    /* Slate 950 */
-    /* Slate 50 */
-
-    --primary: #f8fafc;
-    --primary-foreground: #020617;
-
-    --secondary: #1e293b;
-    /* Slate 800 */
-    --secondary-foreground: #f8fafc;
-
-    --muted: #0f172a;
-    --muted-foreground: #94a3b8;
-
-    --accent: #1e293b;
-    --accent-foreground: #f8fafc;
-
-    --destructive: #7f1d1d;
-    --destructive-foreground: #f8fafc;
-
-    --border: #1e293b;
-    --input: #1e293b;
-    --ring: #cbd5e1;
-  }
-}
-
 body {
   background-color: var(--background);
   font-family: var(--font-sans);
