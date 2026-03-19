@@ -21,9 +21,10 @@ function LoginContent() {
     const redirect = searchParams.get("redirect") || "/";
 
     useEffect(() => {
-        if (!authLoading && user && profile) {
-            // Smart Redirect: Admins go to dashboard by default, regular users go to storefront
-            if (profile.is_admin && redirect === "/") {
+        // Redirect as soon as user is authenticated (don't wait for profile)
+        if (!authLoading && user) {
+            // If profile is loaded and user is admin, send to admin
+            if (profile?.is_admin && redirect === "/") {
                 router.push("/admin");
             } else {
                 router.push(redirect);
@@ -41,35 +42,29 @@ function LoginContent() {
         const password = (formData.get("password") as string).trim();
 
         try {
-            // Special Override for requested Admin Credentials
-            if (email === "admin123@gmail.com" && password === "admin123") {
-                // We attempt to sign in normally first
-                const { error: signInError } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
+            const { data, error: signInError } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
 
-                if (signInError) {
-                    // If the user doesn't exist, we provide a clearer instruction
-                    if (signInError.message.includes("Invalid login credentials")) {
-                        setError("Admin account 'admin123@gmail.com' not found or password incorrect. Please create this account in Supabase first.");
-                        setIsLoading(false);
-                        return;
-                    }
-                    throw signInError;
+            if (signInError) {
+                if (signInError.message.includes("Invalid login credentials")) {
+                    setError("Invalid email or password. Please try again.");
+                } else {
+                    setError(signInError.message);
                 }
-            } else {
-                const { error: signInError } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
+                setIsLoading(false);
+                return;
+            }
 
-                if (signInError) throw signInError;
+            // Sign-in succeeded — force redirect immediately as fallback
+            // This ensures navigation even if the useEffect doesn't fire fast enough
+            if (data?.user) {
+                window.location.href = redirect;
             }
         } catch (err: any) {
             console.error("Login error:", err);
             setError(err.message || "Failed to sign in. Please check your credentials.");
-        } finally {
             setIsLoading(false);
         }
     }
