@@ -26,10 +26,11 @@ const sidebarLinks = [
 
 export function AdminMobileHeader() {
     const pathname = usePathname();
+    const [isOpen, setIsOpen] = React.useState(false);
 
     return (
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 md:hidden">
-            <Sheet>
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger asChild>
                     <Button size="icon" variant="outline" className="sm:hidden">
                         <Menu className="h-5 w-5" />
@@ -43,6 +44,7 @@ export function AdminMobileHeader() {
                     <nav className="grid gap-6 text-lg font-medium">
                         <Link
                             href="/admin"
+                            onClick={() => setIsOpen(false)}
                             className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
                         >
                             <Package2 className="h-5 w-5 transition-all group-hover:scale-110" />
@@ -54,6 +56,7 @@ export function AdminMobileHeader() {
                                 <Link
                                     key={link.href}
                                     href={link.href}
+                                    onClick={() => setIsOpen(false)}
                                     className={cn(
                                         "flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground",
                                         pathname === link.href && "text-foreground font-semibold"
@@ -66,6 +69,7 @@ export function AdminMobileHeader() {
                         })}
                         <Link
                             href="/"
+                            onClick={() => setIsOpen(false)}
                             className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground mt-auto"
                         >
                             <LogOut className="h-5 w-5" />
