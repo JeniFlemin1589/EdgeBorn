@@ -134,21 +134,23 @@ export function Header() {
                                 </Link>
                             )}
                             <Link href="/account">
-                                <Button variant="ghost" className="h-9 px-2 gap-2 rounded-xl hover:bg-secondary/20">
+                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-secondary/20" title="My Account">
                                     <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
                                         <UserIcon className="h-3.5 w-3.5 text-primary" />
                                     </div>
-                                    <span className="text-xs font-bold uppercase tracking-tight hidden sm:inline-block">
-                                        {profile?.first_name || user.email?.split('@')[0]}
-                                    </span>
                                 </Button>
                             </Link>
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-9 w-9 rounded-xl hover:bg-destructive/10 hover:text-destructive"
-                                onClick={() => signOut()}
+                                className="h-9 w-9 rounded-xl hover:bg-destructive/10 hover:text-destructive active:bg-destructive/20"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    signOut();
+                                }}
                                 title="Sign Out"
+                                type="button"
                             >
                                 <LogOut className="h-4 w-4" />
                             </Button>

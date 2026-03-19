@@ -77,12 +77,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const signOut = async () => {
         try {
-            await supabase.auth.signOut();
+            // Use 'global' scope to clear ALL sessions (not just local tab)
+            await supabase.auth.signOut({ scope: 'global' });
         } catch (error) {
             console.error('Logout error:', error);
-        } finally {
-            setUser(null);
-            setProfile(null);
+        }
+        // Clear state regardless of API success
+        setUser(null);
+        setProfile(null);
+        // Clear any remaining Supabase tokens from localStorage
+        if (typeof window !== 'undefined') {
+            const keysToRemove: string[] = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && (key.startsWith('sb-') || key.includes('supabase'))) {
+                    keysToRemove.push(key);
+                }
+            }
+            keysToRemove.forEach(key => localStorage.removeItem(key));
             // Hard redirect to clear all caches and states
             window.location.href = '/';
         }
