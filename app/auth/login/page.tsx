@@ -17,7 +17,7 @@ function LoginContent() {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { user, profile, isLoading: authLoading } = useAuth();
+    const { user, profile, isLoading: authLoading, signInWithGoogle } = useAuth();
     const redirect = searchParams.get("redirect") || "/";
 
     useEffect(() => {

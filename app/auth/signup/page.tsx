@@ -17,7 +17,7 @@ function SignupContent() {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { user } = useAuth();
+    const { user, signInWithGoogle } = useAuth();
     const redirect = searchParams.get("redirect") || "/";
 
     useEffect(() => {
@@ -168,8 +168,7 @@ function SignupContent() {
                 onClick={async () => {
                     try {
                         setIsLoading(true);
-                        const { signInWithGoogle } = useAuth(); // We need to handle this differently if we are in a functional component that already is in the body
-                        // Wait, I should use the hook at the top.
+                        await signInWithGoogle();
                     } catch (err: any) {
                         setError(err.message || "Failed to sign up with Google.");
                         setIsLoading(false);
