@@ -12,11 +12,39 @@ import { useState } from "react";
 
 export default function ContactPage() {
     const [submitted, setSubmitted] = useState(false);
+    const [sending, setSending] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setSubmitted(true);
-        setTimeout(() => setSubmitted(false), 4000);
+        setSending(true);
+        setError(null);
+
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+
+        try {
+            const res = await fetch("/api/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    firstName: formData.get("firstName"),
+                    lastName: formData.get("lastName"),
+                    email: formData.get("email"),
+                    subject: formData.get("subject"),
+                    message: formData.get("message"),
+                }),
+            });
+
+            if (!res.ok) throw new Error("Failed to send message");
+            setSubmitted(true);
+            form.reset();
+            setTimeout(() => setSubmitted(false), 5000);
+        } catch {
+            setError("Failed to send message. Please try emailing us directly.");
+        } finally {
+            setSending(false);
+        }
     };
 
     return (
@@ -68,8 +96,8 @@ export default function ContactPage() {
                                         </div>
                                         <div>
                                             <h3 className="font-bold text-sm uppercase tracking-tight">Email</h3>
-                                            <a href="mailto:edgebornofficial@gmail.com" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                                                edgebornofficial@gmail.com
+                                            <a href="mailto:edgeborn2026@gmail.com" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                                                edgeborn2026@gmail.com
                                             </a>
                                         </div>
                                     </div>
@@ -80,7 +108,7 @@ export default function ContactPage() {
                                         </div>
                                         <div>
                                             <h3 className="font-bold text-sm uppercase tracking-tight">Phone</h3>
-                                            <p className="text-sm text-muted-foreground">+94 77 123 4567</p>
+                                            <p className="text-sm text-muted-foreground">+94 77 055 1779</p>
                                             <p className="text-xs text-muted-foreground/60 mt-0.5">Mon - Sat, 9 AM to 6 PM</p>
                                         </div>
                                     </div>
@@ -91,8 +119,8 @@ export default function ContactPage() {
                                         </div>
                                         <div>
                                             <h3 className="font-bold text-sm uppercase tracking-tight">Address</h3>
-                                            <p className="text-sm text-muted-foreground">EdgeBorn HQ</p>
-                                            <p className="text-sm text-muted-foreground">Colombo 07, Sri Lanka</p>
+                                            <p className="text-sm text-muted-foreground">Kattaikadu, Kottanthivu</p>
+                                            <p className="text-sm text-muted-foreground">Mundel, Puttalam, Sri Lanka</p>
                                         </div>
                                     </div>
 
@@ -147,27 +175,30 @@ export default function ContactPage() {
                                             <div className="grid sm:grid-cols-2 gap-4">
                                                 <div className="space-y-2">
                                                     <Label className="text-xs font-bold uppercase tracking-tight opacity-70">First Name</Label>
-                                                    <Input placeholder="John" required className="h-12 rounded-xl bg-secondary/20 border-secondary/30 focus:bg-white transition-all" />
+                                                    <Input name="firstName" placeholder="John" required className="h-12 rounded-xl bg-secondary/20 border-secondary/30 focus:bg-white transition-all" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label className="text-xs font-bold uppercase tracking-tight opacity-70">Last Name</Label>
-                                                    <Input placeholder="Doe" required className="h-12 rounded-xl bg-secondary/20 border-secondary/30 focus:bg-white transition-all" />
+                                                    <Input name="lastName" placeholder="Doe" required className="h-12 rounded-xl bg-secondary/20 border-secondary/30 focus:bg-white transition-all" />
                                                 </div>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className="text-xs font-bold uppercase tracking-tight opacity-70">Email Address</Label>
-                                                <Input type="email" placeholder="john@example.com" required className="h-12 rounded-xl bg-secondary/20 border-secondary/30 focus:bg-white transition-all" />
+                                                <Input name="email" type="email" placeholder="john@example.com" required className="h-12 rounded-xl bg-secondary/20 border-secondary/30 focus:bg-white transition-all" />
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className="text-xs font-bold uppercase tracking-tight opacity-70">Subject</Label>
-                                                <Input placeholder="Order inquiry, feedback, etc." required className="h-12 rounded-xl bg-secondary/20 border-secondary/30 focus:bg-white transition-all" />
+                                                <Input name="subject" placeholder="Order inquiry, feedback, etc." required className="h-12 rounded-xl bg-secondary/20 border-secondary/30 focus:bg-white transition-all" />
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className="text-xs font-bold uppercase tracking-tight opacity-70">Message</Label>
-                                                <Textarea placeholder="Tell us how we can help you..." required rows={5} className="rounded-xl bg-secondary/20 border-secondary/30 focus:bg-white transition-all resize-none" />
+                                                <Textarea name="message" placeholder="Tell us how we can help you..." required rows={5} className="rounded-xl bg-secondary/20 border-secondary/30 focus:bg-white transition-all resize-none" />
                                             </div>
-                                            <Button type="submit" className="w-full h-12 rounded-xl text-md font-bold uppercase tracking-widest shadow-xl shadow-primary/20">
-                                                Send Message <Send className="ml-2 h-4 w-4" />
+                                            {error && (
+                                                <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</p>
+                                            )}
+                                            <Button type="submit" disabled={sending} className="w-full h-12 rounded-xl text-md font-bold uppercase tracking-widest shadow-xl shadow-primary/20">
+                                                {sending ? "Sending..." : "Send Message"} <Send className="ml-2 h-4 w-4" />
                                             </Button>
                                         </form>
                                     )}

@@ -74,7 +74,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 {/* Reviews Section */}
                 <div className="mt-16 lg:mt-24 max-w-4xl">
                     <hr className="mb-12 border-border" />
-                    <ProductReviews />
+                    <ProductReviews productId={product.id} />
                 </div>
             </main>
             <Footer />

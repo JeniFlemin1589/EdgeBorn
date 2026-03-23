@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Facebook } from "lucide-react";
 
 export function Footer() {
     return (
@@ -40,18 +38,19 @@ export function Footer() {
                     </div>
 
                     <div className="space-y-4">
-                        <h4 className="text-sm font-semibold tracking-wide uppercase text-foreground">Stay Updated</h4>
+                        <h4 className="text-sm font-semibold tracking-wide uppercase text-foreground">Follow Us</h4>
                         <p className="text-sm text-muted-foreground">
-                            Subscribe to get special offers and frequent updates.
+                            Stay connected with EdgeBorn on social media for the latest drops and updates.
                         </p>
-                        <div className="flex gap-2">
-                            <Input placeholder="Enter your email" type="email" />
-                            <Button>Subscribe</Button>
-                        </div>
-                        <div className="flex gap-4 mt-4 text-muted-foreground">
-                            <Facebook className="h-5 w-5 hover:text-foreground cursor-pointer transition-colors" />
-                            <Instagram className="h-5 w-5 hover:text-foreground cursor-pointer transition-colors" />
-                            <Twitter className="h-5 w-5 hover:text-foreground cursor-pointer transition-colors" />
+                        <div className="flex gap-4 mt-4">
+                            <a
+                                href="https://www.facebook.com/share/1BQ8NVhQMp/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <Facebook className="h-5 w-5" />
+                            </a>
                         </div>
                     </div>
                 </div>
