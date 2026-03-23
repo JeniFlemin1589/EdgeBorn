@@ -22,9 +22,10 @@ interface Review {
 
 interface ProductReviewsProps {
     productId: string;
+    onReviewChange?: () => void;
 }
 
-export function ProductReviews({ productId }: ProductReviewsProps) {
+export function ProductReviews({ productId, onReviewChange }: ProductReviewsProps) {
     const { user, profile } = useAuth();
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
@@ -79,6 +80,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
             setRating(5);
             setShowForm(false);
             fetchReviews();
+            onReviewChange?.();
         }
         setSubmitting(false);
     };
