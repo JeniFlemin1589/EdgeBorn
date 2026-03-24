@@ -27,33 +27,53 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         // Check active sessions and sets the user
-        const getSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setUser(session?.user ?? null);
-            if (session?.user) {
-                fetchProfile(session.user.id);
-            } else {
+        const checkSession = async () => {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            
+            if (error || !session) {
+                setUser(null);
+                setProfile(null);
                 setIsLoading(false);
+                return;
             }
+            
+            setUser(session.user);
+            fetchProfile(session.user.id);
         };
 
-        getSession();
+        checkSession();
 
         // Listen for changes on auth state (sign in, sign out, etc.)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             const currentUser = session?.user ?? null;
             setUser(currentUser);
 
             if (currentUser) {
-                await fetchProfile(currentUser.id);
+                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || !profile) {
+                    await fetchProfile(currentUser.id);
+                }
             } else {
                 setProfile(null);
                 setIsLoading(false);
             }
         });
 
+        // Tab visibility listener: Re-check session when user returns to tab
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                checkSession();
+            }
+        };
+        
+        if (typeof window !== 'undefined') {
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+        }
+
         return () => {
             subscription.unsubscribe();
+            if (typeof window !== 'undefined') {
+                document.removeEventListener('visibilitychange', handleVisibilityChange);
+            }
         };
     }, []);
 
@@ -78,16 +98,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const signOut = async () => {
-        try {
-            // Use 'global' scope to clear ALL sessions (not just local tab)
-            await supabase.auth.signOut({ scope: 'global' });
-        } catch (error) {
-            console.error('Logout error:', error);
-        }
-        // Clear state regardless of API success
+        // 1. Optimistically clear state for instant UI update
         setUser(null);
         setProfile(null);
-        // Clear any remaining Supabase tokens from localStorage
+
+        // 2. Clear local storage immediately
         if (typeof window !== 'undefined') {
             const keysToRemove: string[] = [];
             for (let i = 0; i < localStorage.length; i++) {
@@ -97,8 +112,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 }
             }
             keysToRemove.forEach(key => localStorage.removeItem(key));
-            // Hard redirect to clear all caches and states
-            window.location.href = '/';
+        }
+
+        // 3. Attempt API signout but with a hard 2-second timeout so it never hangs
+        try {
+            await Promise.race([
+                supabase.auth.signOut(), 
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
+            ]);
+        } catch (error) {
+            console.error('Logout error (handled silently):', error);
+        } finally {
+            // 4. Force reload to clear all caches
+            if (typeof window !== 'undefined') {
+                window.location.href = '/';
+            }
         }
     };
 
