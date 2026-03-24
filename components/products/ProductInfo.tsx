@@ -35,7 +35,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
     const [showSizeChart, setShowSizeChart] = useState(false);
     const [shared, setShared] = useState(false);
 
-    const incrementQuantity = () => setQuantity((prev) => prev + 1);
+    const incrementQuantity = () => {
+        if (product.inventory && quantity < product.inventory) {
+            setQuantity((prev) => prev + 1);
+        }
+    };
     const decrementQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
     const handleShare = async () => {
@@ -134,20 +138,30 @@ export function ProductInfo({ product }: ProductInfoProps) {
                             <Plus className="h-4 w-4" />
                         </Button>
                     </div>
-                    <Button
-                        className="flex-1 h-10 rounded-xl font-bold uppercase tracking-wide text-sm"
-                        onClick={() => addItem({
-                            productId: product.id,
-                            name: product.name,
-                            price: product.price,
-                            image: product.image || "/placeholder-1.jpg",
-                            size: selectedSize,
-                            color: selectedColor,
-                            quantity: quantity
-                        })}
-                    >
-                        <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
-                    </Button>
+                    <div className="flex flex-col flex-1 gap-1">
+                        <Button
+                            className="h-10 rounded-xl font-bold uppercase tracking-wide text-sm w-full"
+                            disabled={!product.inventory || product.inventory === 0}
+                            onClick={() => addItem({
+                                productId: product.id,
+                                name: product.name,
+                                price: product.price,
+                                image: product.image || "/placeholder-1.jpg",
+                                size: selectedSize,
+                                color: selectedColor,
+                                quantity: quantity
+                            })}
+                        >
+                            <ShoppingCart className="mr-2 h-4 w-4" /> 
+                            {!product.inventory || product.inventory === 0 ? "Out of Stock" : "Add to Cart"}
+                        </Button>
+                        {product.inventory > 0 && product.inventory <= 5 && (
+                            <span className="text-xs text-destructive font-medium text-center">Only {product.inventory} left in stock!</span>
+                        )}
+                        {(!product.inventory || product.inventory === 0) && (
+                            <span className="text-xs text-destructive font-medium text-center">Currently out of stock.</span>
+                        )}
+                    </div>
                     <Button
                         variant="outline"
                         size="icon"

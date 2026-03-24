@@ -12,8 +12,7 @@ export function Hero() {
             {/* Split Layout Container */}
             <div className="container px-4 md:px-6 mx-auto max-w-screen-2xl">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
-                    {/* Text Content */}
-                    <div className="relative z-10 space-y-8 py-12 lg:py-20 text-center lg:text-left">
+                    <div className="relative z-10 space-y-8 py-12 lg:py-20 text-center">
                         <motion.div
                             initial={{ opacity: 0, x: -50 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -27,7 +26,7 @@ export function Hero() {
                                 UNLEASH <br />
                                 YOUR <span className="text-primary italic">EDGE.</span>
                             </h1>
-                            <p className="max-w-[600px] text-lg md:text-xl text-muted-foreground leading-relaxed mx-auto lg:mx-0">
+                            <p className="max-w-[600px] text-lg md:text-xl text-muted-foreground leading-relaxed mx-auto">
                                 Premium street-inspired apparel designed for the bold. Every piece is a statement of quality and independence.
                             </p>
                         </motion.div>
@@ -35,8 +34,7 @@ export function Hero() {
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.3 }}
-                            className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4"
+                            className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
                         >
                             <Link href="/products">
                                 <Button size="lg" className="h-16 px-10 text-lg rounded-full shadow-2xl shadow-primary/20 hover:scale-105 transition-transform">
@@ -55,17 +53,17 @@ export function Hero() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 1, delay: 1 }}
-                            className="flex flex-wrap justify-center lg:justify-start gap-8 pt-8 opacity-60"
+                            className="flex flex-wrap justify-center gap-8 pt-8 opacity-60"
                         >
-                            <div className="text-center lg:text-left">
+                            <div className="text-center">
                                 <div className="text-2xl font-bold">100%</div>
                                 <div className="text-xs uppercase tracking-tighter">Handpicked</div>
                             </div>
-                            <div className="text-center lg:text-left">
+                            <div className="text-center">
                                 <div className="text-2xl font-bold">Bold</div>
                                 <div className="text-xs uppercase tracking-tighter">Designs</div>
                             </div>
-                            <div className="text-center lg:text-left">
+                            <div className="text-center">
                                 <div className="text-2xl font-bold">Premium</div>
                                 <div className="text-xs uppercase tracking-tighter">Quality</div>
                             </div>

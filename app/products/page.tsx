@@ -179,7 +179,7 @@ function ProductList() {
                                     <ProductCard
                                         key={product.id}
                                         {...product}
-                                        isNew={new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
+                                        isNew={new Date(product.created_at) > new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)}
                                         priority={index < 4}
                                     />
                                 ))}

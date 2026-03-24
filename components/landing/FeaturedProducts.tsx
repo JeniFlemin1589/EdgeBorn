@@ -55,8 +55,8 @@ export function FeaturedProducts() {
 
             <div className="container px-4 md:px-6 mx-auto max-w-screen-2xl relative z-10">
                 <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
-                    <div className="space-y-4 max-w-2xl text-center md:text-left">
-                        <div className="flex items-center gap-2 text-primary font-black uppercase tracking-widest text-sm justify-center md:justify-start">
+                    <div className="space-y-4 max-w-2xl text-center">
+                        <div className="flex items-center gap-2 text-primary font-black uppercase tracking-widest text-sm justify-center">
                             <Sparkles className="h-4 w-4" /> Trending Now
                         </div>
                         <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none">
