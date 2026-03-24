@@ -58,16 +58,16 @@ export function Hero() {
                             className="flex flex-wrap justify-center lg:justify-start gap-8 pt-8 opacity-60"
                         >
                             <div className="text-center lg:text-left">
-                                <div className="text-2xl font-bold">50k+</div>
-                                <div className="text-xs uppercase tracking-tighter">Customers</div>
+                                <div className="text-2xl font-bold">100%</div>
+                                <div className="text-xs uppercase tracking-tighter">Handpicked</div>
                             </div>
                             <div className="text-center lg:text-left">
-                                <div className="text-2xl font-bold">120+</div>
+                                <div className="text-2xl font-bold">Bold</div>
                                 <div className="text-xs uppercase tracking-tighter">Designs</div>
                             </div>
                             <div className="text-center lg:text-left">
-                                <div className="text-2xl font-bold">100%</div>
-                                <div className="text-xs uppercase tracking-tighter">Premium</div>
+                                <div className="text-2xl font-bold">Premium</div>
+                                <div className="text-xs uppercase tracking-tighter">Quality</div>
                             </div>
                         </motion.div>
                     </div>

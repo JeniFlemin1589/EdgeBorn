@@ -23,6 +23,7 @@ function ProductList() {
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [sortBy, setSortBy] = useState<"newest" | "price-low" | "price-high">("newest");
+    const [visibleCount, setVisibleCount] = useState(12);
     const { products, isLoading } = useProducts();
     const searchParams = useSearchParams();
 
@@ -80,6 +81,14 @@ function ProductList() {
         });
     }, [products, categoryFilter, searchFilter, minPrice, maxPrice, sizeFilter, colorFilter, sortBy, favoritesOnly, wishlist]);
 
+    // Reset visible count when filters change
+    useEffect(() => {
+        setVisibleCount(12);
+    }, [categoryFilter, searchFilter, minPrice, maxPrice, sizeFilter, colorFilter, sortBy, favoritesOnly]);
+
+    const visibleProducts = filteredAndSortedProducts.slice(0, visibleCount);
+    const hasMore = visibleCount < filteredAndSortedProducts.length;
+
     return (
         <div className="flex min-h-screen flex-col">
             <Header />
@@ -91,7 +100,7 @@ function ProductList() {
                             {categoryFilter ? `${categoryFilter} Collection` : "All Products"}
                         </h1>
                         <p className="text-muted-foreground mt-1 text-sm md:text-base">
-                            Showing {filteredAndSortedProducts.length} results
+                            Showing {visibleProducts.length} of {filteredAndSortedProducts.length} results
                             {searchFilter && ` for "${searchFilter}"`}
                         </p>
                     </div>
@@ -164,14 +173,14 @@ function ProductList() {
                     <div className="flex-1">
                         {isLoading && products.length === 0 ? (
                             <ProductSkeletonGrid count={8} />
-                        ) : filteredAndSortedProducts.length > 0 ? (
+                        ) : visibleProducts.length > 0 ? (
                             <div className="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-6">
-                                {filteredAndSortedProducts.map((product, index) => (
+                                {visibleProducts.map((product, index) => (
                                     <ProductCard
                                         key={product.id}
                                         {...product}
-                                        isNew={new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)} // New if created in last 7 days
-                                        priority={index < 4} // Prioritize first 4 images
+                                        isNew={new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
+                                        priority={index < 4}
                                     />
                                 ))}
                             </div>
@@ -182,12 +191,17 @@ function ProductList() {
                             </div>
                         )}
 
-                        {/* Pagination (Visual only for now) */}
-                        {filteredAndSortedProducts.length > 12 && (
-                            <div className="mt-12 flex justify-center gap-2">
-                                <Button variant="outline" disabled>Previous</Button>
-                                <Button variant="default" className="w-10 rounded-xl">1</Button>
-                                <Button variant="outline" className="w-10 rounded-xl">Next</Button>
+                        {/* Load More */}
+                        {hasMore && (
+                            <div className="mt-12 flex justify-center">
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    className="rounded-xl px-12 font-bold uppercase tracking-widest"
+                                    onClick={() => setVisibleCount(prev => prev + 12)}
+                                >
+                                    Load More
+                                </Button>
                             </div>
                         )}
                     </div>
