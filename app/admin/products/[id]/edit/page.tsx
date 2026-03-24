@@ -26,6 +26,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const { products, updateProduct, isLoading: contextLoading } = useProducts();
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(true);
+    const [isUploading, setIsUploading] = useState(false);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -78,6 +79,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             const data = new FormData();
             data.append("file", file);
 
+            setIsUploading(true);
             try {
                 const res = await fetch("/api/upload", {
                     method: "POST",
@@ -91,6 +93,9 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             } catch (err) {
                 console.error(err);
                 alert("Failed to upload image. Please try again.");
+                setFormData(prev => ({ ...prev, image: "" }));
+            } finally {
+                setIsUploading(false);
             }
         }
     };
@@ -141,13 +146,12 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 colors: formData.colors,
             });
 
-            router.push("/admin/products");
             router.refresh();
+            router.push("/admin/products");
         } catch (error: any) {
             console.error("Failed to update product:", error);
             alert(`Error updating product: ${error.message || "Unknown error"}`);
-        } finally {
-            setIsLoading(false);
+            setIsLoading(false); // Only reset on failure
         }
     };
 
@@ -254,23 +258,39 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                     {formData.image ? (
                                         <div className="relative w-full h-full p-2">
                                             <img src={formData.image} alt="Preview" className="w-full h-full object-contain rounded-md" />
-                                            <Button
-                                                variant="destructive"
-                                                size="icon"
-                                                className="absolute top-2 right-2 h-6 w-6"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    setFormData(prev => ({ ...prev, image: "" }))
-                                                }}
-                                            >
-                                                <X className="h-3 w-3" />
-                                            </Button>
+                                            {isUploading ? (
+                                                <div className="absolute inset-0 bg-background/50 flex flex-col items-center justify-center rounded-md">
+                                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                                    <span className="text-xs font-bold mt-2 text-foreground">Uploading...</span>
+                                                </div>
+                                            ) : (
+                                                <Button
+                                                    variant="destructive"
+                                                    size="icon"
+                                                    className="absolute top-2 right-2 h-6 w-6"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setFormData(prev => ({ ...prev, image: "" }))
+                                                    }}
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </Button>
+                                            )}
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
-                                            <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
-                                            <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold uppercase tracking-widest">Click to upload</span></p>
-                                            <p className="text-xs text-muted-foreground">PNG, JPG (Max 5MB)</p>
+                                            {isUploading ? (
+                                                <>
+                                                    <Loader2 className="w-8 h-8 mb-4 text-primary animate-spin" />
+                                                    <p className="mb-2 text-sm text-foreground"><span className="font-semibold uppercase tracking-widest">Uploading...</span></p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
+                                                    <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold uppercase tracking-widest">Click to upload</span></p>
+                                                    <p className="text-xs text-muted-foreground">PNG, JPG (Max 5MB)</p>
+                                                </>
+                                            )}
                                         </div>
                                     )}
                                     <Input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
@@ -318,10 +338,10 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             </div>
 
             <div className="flex justify-end gap-4 pt-4 border-t">
-                <Button variant="outline" size="lg" onClick={() => router.back()} disabled={isLoading} className="rounded-xl uppercase font-bold tracking-widest">Cancel</Button>
-                <Button size="lg" onClick={handleSubmit} disabled={isLoading} className="rounded-xl uppercase font-bold tracking-widest px-8">
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                    Save Changes
+                <Button variant="outline" size="lg" onClick={() => router.back()} disabled={isLoading || isUploading} className="rounded-xl uppercase font-bold tracking-widest">Cancel</Button>
+                <Button size="lg" onClick={handleSubmit} disabled={isLoading || isUploading} className="rounded-xl uppercase font-bold tracking-widest px-8">
+                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />)}
+                    {isUploading ? "Uploading..." : (isLoading ? "Saving..." : "Save Changes")}
                 </Button>
             </div>
         </div >

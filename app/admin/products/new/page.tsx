@@ -24,6 +24,7 @@ export default function NewProductPage() {
     const router = useRouter();
     const { addProduct } = useProducts();
     const [isLoading, setIsLoading] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -56,9 +57,8 @@ export default function NewProductPage() {
             const data = new FormData();
             data.append("file", file);
 
+            setIsUploading(true);
             try {
-                // Show loading state for image?
-                // For now just optimistic UI or wait
                 const res = await fetch("/api/upload", {
                     method: "POST",
                     body: data,
@@ -71,6 +71,9 @@ export default function NewProductPage() {
             } catch (err) {
                 console.error(err);
                 alert("Failed to upload image. Please try again.");
+                setFormData(prev => ({ ...prev, image: "" })); // reset on error
+            } finally {
+                setIsUploading(false);
             }
         }
     };
@@ -124,13 +127,12 @@ export default function NewProductPage() {
                 status: "Active"
             });
 
-            router.push("/admin/products");
             router.refresh(); // Ensure the page reloads with fresh data
+            router.push("/admin/products");
         } catch (error: any) {
             console.error("Failed to create product:", error);
             alert(`Error adding product: ${error.message || "Unknown error"}`);
-        } finally {
-            setIsLoading(false);
+            setIsLoading(false); // only reset on error, let it stay true while navigating
         }
     };
 
@@ -222,26 +224,42 @@ export default function NewProductPage() {
                                     {formData.image ? (
                                         <div className="relative w-full h-full p-2">
                                             <img src={formData.image} alt="Preview" className="w-full h-full object-contain rounded-md" />
-                                            <Button
-                                                variant="destructive"
-                                                size="icon"
-                                                className="absolute top-2 right-2 h-6 w-6"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    setFormData(prev => ({ ...prev, image: "" }))
-                                                }}
-                                            >
-                                                <X className="h-3 w-3" />
-                                            </Button>
+                                            {isUploading ? (
+                                                <div className="absolute inset-0 bg-background/50 flex flex-col items-center justify-center rounded-md">
+                                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                                    <span className="text-xs font-bold mt-2 text-foreground">Uploading...</span>
+                                                </div>
+                                            ) : (
+                                                <Button
+                                                    variant="destructive"
+                                                    size="icon"
+                                                    className="absolute top-2 right-2 h-6 w-6"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setFormData(prev => ({ ...prev, image: "" }))
+                                                    }}
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </Button>
+                                            )}
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
-                                            <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
-                                            <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span></p>
-                                            <p className="text-xs text-muted-foreground">PNG, JPG (Max 5MB)</p>
-                                            <Button variant="secondary" size="sm" className="mt-4 pointer-events-none">
-                                                Select File
-                                            </Button>
+                                            {isUploading ? (
+                                                <>
+                                                    <Loader2 className="w-8 h-8 mb-4 text-primary animate-spin" />
+                                                    <p className="mb-2 text-sm text-foreground"><span className="font-semibold">Uploading...</span></p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
+                                                    <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span></p>
+                                                    <p className="text-xs text-muted-foreground">PNG, JPG (Max 5MB)</p>
+                                                    <Button variant="secondary" size="sm" className="mt-4 pointer-events-none">
+                                                        Select File
+                                                    </Button>
+                                                </>
+                                            )}
                                         </div>
                                     )}
                                     <Input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
@@ -301,10 +319,10 @@ export default function NewProductPage() {
             </div>
 
             <div className="flex justify-end gap-4 pt-4 border-t">
-                <Button variant="outline" size="lg" onClick={() => router.back()} disabled={isLoading}>Cancel</Button>
-                <Button size="lg" onClick={handleSubmit} disabled={isLoading}>
+                <Button variant="outline" size="lg" onClick={() => router.back()} disabled={isLoading || isUploading}>Cancel</Button>
+                <Button size="lg" onClick={handleSubmit} disabled={isLoading || isUploading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Create Product
+                    {isUploading ? "Uploading Image..." : (isLoading ? "Creating..." : "Create Product")}
                 </Button>
             </div>
         </div >

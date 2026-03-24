@@ -39,9 +39,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
     // Fetch products from Supabase
     const fetchProducts = useCallback(async (isInitialLoad = false) => {
-        if (isInitialLoad && products.length === 0) {
-            setIsLoading(true);
-        }
+        setIsLoading(prev => isInitialLoad ? true : prev);
         setError(null);
         try {
             const { data, error: fetchError } = await supabase
@@ -82,7 +80,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
         } finally {
             setIsLoading(false);
         }
-    }, [products.length]);
+    }, []);
 
     // Load products on mount
     useEffect(() => {
