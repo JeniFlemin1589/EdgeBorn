@@ -22,9 +22,10 @@ interface ProductCardProps {
     priority?: boolean;
     sizes?: string[];
     colors?: { name: string; value?: string; hex?: string; [key: string]: any }[];
+    inventory?: number;
 }
 
-export function ProductCard({ id, name, price, image, category, isNew, isSale, priority, sizes = [], colors = [] }: ProductCardProps) {
+export function ProductCard({ id, name, price, image, category, isNew, isSale, priority, sizes = [], colors = [], inventory = 0 }: ProductCardProps) {
     const { addItem } = useCart();
     const { toggleFavorite, isFavorite } = useWishlist();
     const favorite = isFavorite(id);
@@ -86,7 +87,8 @@ export function ProductCard({ id, name, price, image, category, isNew, isSale, p
                                 image: image,
                                 size: sizes && sizes.length > 0 ? sizes[0] : "M", 
                                 color: colors && colors.length > 0 ? colors[0].name : "Default", 
-                                quantity: 1
+                                quantity: 1,
+                                stock: inventory || 0
                             });
                         }}
                     >

@@ -80,6 +80,7 @@ export function CartSheet() {
                                                     <button
                                                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                                         className="px-2 hover:bg-muted transition-colors h-full"
+                                                        disabled={item.stock !== undefined ? item.quantity >= item.stock : false}
                                                     >
                                                         <Plus className="h-3 w-3" />
                                                     </button>

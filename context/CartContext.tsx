@@ -11,6 +11,7 @@ export type CartItem = {
     size: string;
     color: string;
     quantity: number;
+    stock: number;
 };
 
 interface CartContextType {
@@ -65,7 +66,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
             if (existingItemIndex > -1) {
                 const updatedItems = [...currentItems];
-                updatedItems[existingItemIndex].quantity += newItem.quantity;
+                const existing = updatedItems[existingItemIndex];
+                updatedItems[existingItemIndex].quantity = Math.min(existing.quantity + newItem.quantity, newItem.stock ?? 99);
                 return updatedItems;
             }
 
@@ -84,7 +86,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         if (quantity < 1) return;
         setItems((currentItems) =>
             currentItems.map((item) =>
-                item.id === id ? { ...item, quantity } : item
+                item.id === id ? { ...item, quantity: Math.min(quantity, item.stock ?? 99) } : item
             )
         );
     };

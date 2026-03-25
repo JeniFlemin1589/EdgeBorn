@@ -149,7 +149,8 @@ export function ProductInfo({ product }: ProductInfoProps) {
                                 image: product.image || "/placeholder-1.jpg",
                                 size: selectedSize,
                                 color: selectedColor,
-                                quantity: quantity
+                                quantity: quantity,
+                                stock: product.inventory || 0
                             })}
                         >
                             <ShoppingCart className="mr-2 h-4 w-4" /> 

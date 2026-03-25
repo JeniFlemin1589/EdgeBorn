@@ -90,6 +90,7 @@ export function FeaturedProducts() {
                             category={product.category}
                             sizes={product.sizes}
                             colors={product.colors}
+                            inventory={product.inventory}
                         />
                     ))}
                 </motion.div>

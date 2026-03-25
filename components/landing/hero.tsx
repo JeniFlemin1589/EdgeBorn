@@ -5,28 +5,22 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ShoppingBag } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export function Hero() {
     const [isHovering, setIsHovering] = useState(false);
-    const [frameIndex, setFrameIndex] = useState(0);
-
-    const frames = [
-        "/images/landing/hero-seq-1.jpg",
-        "/images/landing/hero-seq-2.jpg",
-        "/images/landing/hero-seq-3.jpg"
-    ];
+    const videoRef = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
-        let timer: NodeJS.Timeout;
-        if (isHovering) {
-            timer = setInterval(() => {
-                setFrameIndex((prev) => (prev + 1) % frames.length);
-            }, 600); // Crossfade speed per frame setup
-        } else {
-            setFrameIndex(0);
+        if (videoRef.current) {
+            if (isHovering) {
+                videoRef.current.play().catch(() => {
+                    // Ignore auto-play errors in unsupported browsers
+                });
+            } else {
+                videoRef.current.pause();
+            }
         }
-        return () => clearInterval(timer);
     }, [isHovering]);
 
     return (
@@ -113,21 +107,22 @@ export function Hero() {
                             }}
                             transition={{ type: "spring", stiffness: 300, damping: 20 }}
                         >
-                            {frames.map((src, idx) => (
-                                <div 
-                                    key={src} 
-                                    className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${frameIndex === idx ? "opacity-100 z-10" : "opacity-0 z-0"}`}
-                                >
-                                    <Image
-                                        src={src}
-                                        alt={`EdgeBorn Action ${idx + 1}`}
-                                        fill
-                                        sizes="(max-width: 768px) 100vw, 50vw"
-                                        className="object-cover object-[center_top]"
-                                        priority
-                                    />
-                                </div>
-                            ))}
+                            <video 
+                                ref={videoRef}
+                                src="/video/hero-video.mp4"
+                                loop
+                                muted
+                                playsInline
+                                className="object-cover object-[center_top] h-full w-full absolute inset-0 z-0"
+                            />
+                            {/* Fallback image shown behind transparent video or if video 404s */}
+                            <Image
+                                src="/images/landing/hero-red.jpg"
+                                alt="EdgeBorn Featured Hoodie"
+                                fill
+                                className="object-cover object-[center_top] -z-10"
+                                priority
+                            />
                         </motion.div>
                     </motion.div>
                 </div>
