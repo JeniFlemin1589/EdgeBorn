@@ -20,9 +20,11 @@ interface ProductCardProps {
     isNew?: boolean;
     isSale?: boolean;
     priority?: boolean;
+    sizes?: string[];
+    colors?: { name: string; value?: string; hex?: string; [key: string]: any }[];
 }
 
-export function ProductCard({ id, name, price, image, category, isNew, isSale, priority }: ProductCardProps) {
+export function ProductCard({ id, name, price, image, category, isNew, isSale, priority, sizes = [], colors = [] }: ProductCardProps) {
     const { addItem } = useCart();
     const { toggleFavorite, isFavorite } = useWishlist();
     const favorite = isFavorite(id);
@@ -82,8 +84,8 @@ export function ProductCard({ id, name, price, image, category, isNew, isSale, p
                                 name: name,
                                 price: price,
                                 image: image,
-                                size: "M", // Default
-                                color: "Default", // Default
+                                size: sizes && sizes.length > 0 ? sizes[0] : "M", 
+                                color: colors && colors.length > 0 ? colors[0].name : "Default", 
                                 quantity: 1
                             });
                         }}

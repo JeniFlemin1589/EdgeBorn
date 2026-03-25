@@ -88,6 +88,8 @@ export function FeaturedProducts() {
                             price={product.price}
                             image={product.image}
                             category={product.category}
+                            sizes={product.sizes}
+                            colors={product.colors}
                         />
                     ))}
                 </motion.div>

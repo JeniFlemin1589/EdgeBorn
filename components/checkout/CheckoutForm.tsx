@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { useOrders } from "@/context/OrderContext";
 import { useAuth } from "@/context/AuthContext";
@@ -12,6 +12,7 @@ import { CheckCircle2, CreditCard, Truck, AlertCircle, Mail, Lock, Loader2 } fro
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import Image from "next/image";
 
 const STEPS = [
     { id: 1, title: "Shipping", icon: Truck },
@@ -24,6 +25,7 @@ export function CheckoutForm() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [processStatus, setProcessStatus] = useState<string>("");
     const [paymentMethod, setPaymentMethod] = useState("email");
+    const [authTimeout, setAuthTimeout] = useState(false);
 
     // Form fields
     const [formData, setFormData] = useState({
@@ -155,7 +157,18 @@ export function CheckoutForm() {
         }
     };
 
-    if (isAuthLoading) {
+    // Using a quick inline effect to detect long-running auth loads
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (isAuthLoading) {
+            timer = setTimeout(() => {
+                setAuthTimeout(true);
+            }, 6000); // 6s timeout fallback
+        }
+        return () => clearTimeout(timer);
+    }, [isAuthLoading]);
+
+    if (isAuthLoading && !authTimeout) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -371,7 +384,13 @@ export function CheckoutForm() {
                         <p className="text-xs font-semibold text-muted-foreground uppercase">Items</p>
                         {items.slice(0, 3).map((item) => (
                             <div key={item.id} className="flex gap-3">
-                                <div className="bg-secondary/20 rounded h-10 w-10 flex-shrink-0" />
+                                <div className="bg-secondary/20 rounded h-10 w-10 flex-shrink-0 relative overflow-hidden">
+                                    {item.image && item.image !== "/placeholder-1.jpg" ? (
+                                        <Image src={item.image} alt={item.name} fill className="object-cover" sizes="40px" />
+                                    ) : (
+                                        <div className="h-full w-full bg-secondary/30 flex items-center justify-center text-[8px] font-bold text-muted-foreground">IMG</div>
+                                    )}
+                                </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-xs font-medium truncate">{item.name}</p>
                                     <p className="text-[10px] text-muted-foreground">{item.quantity} x Rs. {item.price.toFixed(2)}</p>
