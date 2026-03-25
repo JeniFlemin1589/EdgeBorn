@@ -5,8 +5,30 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ShoppingBag } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export function Hero() {
+    const [isHovering, setIsHovering] = useState(false);
+    const [frameIndex, setFrameIndex] = useState(0);
+
+    const frames = [
+        "/images/landing/hero-seq-1.jpg",
+        "/images/landing/hero-seq-2.jpg",
+        "/images/landing/hero-seq-3.jpg"
+    ];
+
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (isHovering) {
+            timer = setInterval(() => {
+                setFrameIndex((prev) => (prev + 1) % frames.length);
+            }, 600); // Crossfade speed per frame setup
+        } else {
+            setFrameIndex(0);
+        }
+        return () => clearInterval(timer);
+    }, [isHovering]);
+
     return (
         <section className="relative min-h-[90vh] flex items-center bg-[#fdfaf5] overflow-hidden">
             {/* Split Layout Container */}
@@ -79,29 +101,34 @@ export function Hero() {
                     >
                         <div className="absolute inset-0 bg-primary/5 rounded-[40px] rotate-3 -z-10" />
                         <div className="absolute inset-0 bg-secondary rounded-[40px] -rotate-2 -z-10" />
-                        <div className="relative h-full w-full rounded-[40px] overflow-hidden shadow-2xl">
-                            <Image
-                                src="/images/landing/hero-red.jpg"
-                                alt="EdgeBorn Featured Hoodie"
-                                fill
-                                className="object-cover object-center"
-                                priority
-                            />
-                            {/* Overlay Card */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 50 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 1.2 }}
-                                className="absolute bottom-10 left-10 right-10 p-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white hidden md:block"
-                            >
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <div className="text-sm font-medium opacity-80">Featured Piece</div>
-                                        <div className="text-xl font-bold italic">Crimson Utility Hoodie</div>
-                                    </div>
+                        <motion.div 
+                            className="relative h-full w-full rounded-[40px] overflow-hidden shadow-2xl"
+                            onHoverStart={() => setIsHovering(true)}
+                            onHoverEnd={() => setIsHovering(false)}
+                            whileHover={{ 
+                                scale: 1.03,
+                                rotateY: -5,
+                                rotateX: 5,
+                                boxShadow: "0 30px 60px -12px rgba(0, 0, 0, 0.5)"
+                            }}
+                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        >
+                            {frames.map((src, idx) => (
+                                <div 
+                                    key={src} 
+                                    className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${frameIndex === idx ? "opacity-100 z-10" : "opacity-0 z-0"}`}
+                                >
+                                    <Image
+                                        src={src}
+                                        alt={`EdgeBorn Action ${idx + 1}`}
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                        className="object-cover object-[center_top]"
+                                        priority
+                                    />
                                 </div>
-                            </motion.div>
-                        </div>
+                            ))}
+                        </motion.div>
                     </motion.div>
                 </div>
             </div>
